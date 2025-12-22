@@ -9,12 +9,13 @@ plotly
 jupyterlab_mathjax2
 seaborn
 
-ipympl
-pythreejs 
 ipywidgets
 qiskit
 qiskit-aer
 pillow
-widgetsnbextension
 pylatexenc
 notebook
+
+ipympl 
+pythreejs 
+widgetsnbextension

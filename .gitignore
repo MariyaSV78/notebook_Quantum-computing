@@ -1,0 +1,20 @@
+# ===== Virtual environments =====
+venv/
+.venv/
+env/
+ENV/
+Quantum_Computing_venv/
+
+# ===== Python cache & compiled files =====
+__pycache__/
+
+# ===== Logs & runtime files =====
+*.log
+*.pid
+
+# ===== Jupyter service files (not notebooks) =====
+.ipynb_checkpoints/
+
+# ===== Editors =====
+.vscode/
+.idea/
