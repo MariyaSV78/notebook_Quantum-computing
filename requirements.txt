@@ -10,8 +10,10 @@ jupyterlab_mathjax2
 seaborn
 
 ipywidgets
-qiskit
-qiskit-aer
+qiskit==2.3.0
+qiskit-aer==0.17.2
+qiskit-nature
+# qiskit-terra==0.46.3
 pillow
 pylatexenc
 notebook
@@ -19,3 +21,8 @@ notebook
 ipympl 
 pythreejs 
 widgetsnbextension
+
+# VQE / IBM Quantum
+qiskit-ibm-runtime
+qiskit-serverless
+qiskit-ibm-catalog

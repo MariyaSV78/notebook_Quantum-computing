@@ -33,7 +33,8 @@ echo "--- Using Python ---"
 which python
 
 echo "--- Installing Python packages ---"
-echo "--- Installing Python packages ---"
+python -m pip install --upgrade pip
+
 if [ -f "$SCRIPTPATH/requirements.txt" ]; then
     python -m pip install -r "$SCRIPTPATH/requirements.txt"
 else
@@ -46,11 +47,6 @@ python -m ipykernel install \
   --user \
   --name "$VENV_NAME" \
   --display-name "Python ($VENV_NAME)"
-
-# echo "--- Enabling classic notebook extensions ---"
-# python -m jupyter nbextension enable --py widgetsnbextension --sys-prefix
-# python -m jupyter nbextension enable --py ipympl --sys-prefix
-# python -m jupyter nbextension enable --py pythreejs --sys-prefix
 
 echo "✅ Environment setup complete."
 echo "You can now run:"
