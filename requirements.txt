@@ -1,25 +1,25 @@
 numpy
 matplotlib==3.10.7
 scipy
-scikit-learn
+# scikit-learn
 ipykernel
-pandas
-nb_mypy
+# pandas
+# nb_mypy
 plotly
-jupyterlab_mathjax2
-seaborn
+# jupyterlab_mathjax2
+# seaborn
 
 ipywidgets
 qiskit==2.3.0
 qiskit-aer==0.17.2
 qiskit-nature
-pillow
-pylatexenc
+# pillow
+# pylatexenc
 notebook
 pyscf 
 ipympl 
-pythreejs 
-widgetsnbextension
+# pythreejs 
+# widgetsnbextension
 
 # VQE / IBM Quantum
 qiskit-ibm-runtime
