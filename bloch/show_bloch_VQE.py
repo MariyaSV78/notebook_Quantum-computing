@@ -56,6 +56,14 @@ def bloch_vector_h2(theta):
     b = np.sin(theta)   # |10>_logical
     return bloch_vector(a, b)
 
+def energy_logical(theta, c0, c1, c2, c3, c4, c5, E_nn=0.0):
+    return (
+        (c0 - c3)
+        + (c1 - c2) * np.cos(2 * theta)
+        + (c4 + c5) * np.sin(2 * theta)
+        + E_nn
+    )
+
 def show_bloch_energy(
     energy_vals,
     theta_vals,
