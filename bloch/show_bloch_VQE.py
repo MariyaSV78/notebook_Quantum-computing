@@ -7,7 +7,7 @@ from qiskit.visualization.bloch import Bloch
 
 import ipywidgets as widgets
 from IPython.display import display
-
+import matplotlib.gridspec as gridspec
 
 def qiskit_state(theta):
     qc = QuantumCircuit(1)
@@ -15,6 +15,11 @@ def qiskit_state(theta):
     state = Statevector.from_instruction(qc)
     return qc, state
 
+def qiskit_state_h2(theta):
+    qc = QuantumCircuit(2)
+    qc.initialize([0, np.cos(theta), np.sin(theta), 0], [0, 1])
+    state = Statevector.from_instruction(qc)
+    return qc, state
 
 def bloch_vector(a,b):
     x = 2 * np.real(np.conj(a) * b)
@@ -52,17 +57,27 @@ def bloch_vector_h2plus(theta):
     return bloch_vector(a, b)
 
 def bloch_vector_h2(theta):
-    a = np.cos(theta)   # |01>_logical
-    b = np.sin(theta)   # |10>_logical
+    # Matches your actual ansatz:
+    # |psi(theta)> = cos(theta)|0> - sin(theta)|1>
+    a = np.cos(theta)
+    b = -np.sin(theta)
     return bloch_vector(a, b)
 
-def energy_logical(theta, c0, c1, c2, c3, c4, c5, E_nn=0.0):
-    return (
-        (c0 - c3)
-        + (c1 - c2) * np.cos(2 * theta)
-        + (c4 + c5) * np.sin(2 * theta)
-        + E_nn
-    )
+def qiskit_state_h2_logical(theta):
+    qc = QuantumCircuit(1)
+    qc.ry(-theta, 0)
+    state = Statevector.from_instruction(qc)
+    return qc, state
+
+def bloch_vector_h2_logical(theta):
+    # _, state = qiskit_state_h2_logical(theta)
+    # a = state.data[0]
+    # b = state.data[1]
+
+    a = np.cos(theta)
+    b = -np.sin(theta)
+    return bloch_vector(a, b)
+
 
 def show_bloch_energy(
     energy_vals,
@@ -70,9 +85,9 @@ def show_bloch_energy(
     bloch_func,
     figure_description="Bloch sphere",
     interval=250,
-    figsize=(9, 4),
+    figsize=(10, 4),
     bloch_font_size=10,
-    title_pad=20,
+    title_pad=40,
     slider_description="Frame",
     z_labels=(r"$|0\rangle$", r"$|1\rangle$")
 ):
@@ -96,9 +111,16 @@ def show_bloch_energy(
     plt.close("all")
 
     fig = plt.figure(figsize=figsize)
-    ax0 = fig.add_subplot(1, 2, 1, projection="3d")
-    ax1 = fig.add_subplot(1, 2, 2)
-    plt.subplots_adjust(bottom=0.15, wspace=0.3)
+
+    gs = gridspec.GridSpec(
+    1, 2,
+    width_ratios=[1, 1.3],  # ← make second plot larger
+    wspace=0.4            # ← control spacing here
+    )
+
+    ax0 = fig.add_subplot(gs[0], projection="3d")
+    ax1 = fig.add_subplot(gs[1])
+    plt.subplots_adjust(bottom=0.15, wspace=1)
 
     ax1.plot(theta_vals, energy_vals)
     point, = ax1.plot([], [], "ro", markersize=8)
@@ -111,22 +133,47 @@ def show_bloch_energy(
     def update_frame(i):
         theta = theta_vals[i]
         # _, state = qiskit_state(theta)
-        vec = bloch_func(theta)
+        # vec = bloch_func(theta)
         E = energy_vals[i]
 
+        if i == len(theta_vals) - 1:
+            idx_min = np.argmin(energy_vals)
+            theta = theta_vals[idx_min]
+            E = energy_vals[idx_min]
+        
+        vec = bloch_func(theta)
+  
         ax0.cla()
         bloch = Bloch(axes=ax0)
         bloch.font_size = bloch_font_size
         bloch.zlabel = list(z_labels)
         bloch.add_vectors(vec)
         bloch.render()
-        ax0.set_title(fr"{figure_description}, $\theta = {theta:.3f}$", pad=title_pad)
+        # ax0.set_title(fr"{figure_description} \n$\theta = {theta:.3f}$", pad=title_pad)
+        ax0.set_title(figure_description, pad=title_pad)
+
+        ax0.text2D(
+            0.5, 1.03,   # move higher
+            fr"$\theta = {theta:.3f}$",
+            transform=ax0.transAxes,
+            ha="center"
+        )
 
         point.set_data([theta], [E])
         vline.set_xdata([theta, theta])
-        ax1.set_title(fr"Energy curve, $E(\theta) = {E:.6f}$")
+        ax1.set_title(fr"Energy curve, $E(\theta) = {E:.6f}$", pad=15)
+        if i == len(theta_vals) - 1:
+            idx_min = np.argmin(energy_vals)
+            theta_min = theta_vals[idx_min]
+            E_min = energy_vals[idx_min]
+
+            point.set_data([theta_min], [E_min])
+            vline.set_xdata([theta_min, theta_min]) 
+            
+            ax1.set_title(fr"Energy curve, $E(\theta) = {E_min:.6f}$", pad=15)
 
         fig.canvas.draw_idle()
+
 
     play = widgets.Play(
         value=0,
@@ -146,9 +193,6 @@ def show_bloch_energy(
         description=slider_description,
         continuous_update=False,
     )
-    E_min = np.min(energy_vals)
-    idx_min = np.argmin(energy_vals)
-    theta_min = theta_vals[idx_min]
 
     widgets.jslink((play, "value"), (slider, "value"))
 
